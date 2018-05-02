@@ -1,5 +1,12 @@
 #!/usr/local/bin/python3
 
+"""
+    Use parse function to analyze the inputs.
+
+    is_add_mac_legal function returns True when the data of "add mac" keywords thing are all correct,
+    returns False when incorrect following by false data to be referenced.
+"""
+
 import re
 import json
 
