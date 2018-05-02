@@ -43,7 +43,7 @@ def parser(text_=None, regex=REGEX_ITEMS, pattern=REGEX_PATTERNS):
         set: lambda x: ' '.join(str(i) for i in x),
         list: lambda x: ' '.join(str(i) for i in x),
         dict: lambda x: json.dumps(x),
-        str: lambda x: x
+        str: lambda x: x,
     }.get(type(text_), lambda x: str(text_))(text_)
     result = {}  # return dict
 

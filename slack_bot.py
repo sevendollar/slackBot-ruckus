@@ -95,7 +95,7 @@ def parse_user_words(words):
         'team_user': team_user,
         'customer_name': customer_name,
         'customer_id': customer_id,
-        'mac': mac
+        'mac': mac,
     }
     return new_words or None
 
