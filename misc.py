@@ -79,7 +79,7 @@ def deduplicate(x):
     for i in x:
         if i not in r:
             r.append(i)
-    return tuple(r)
+    return tuple(r) or None
 
 
 def is_add_mac_legal(result):
