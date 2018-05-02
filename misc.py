@@ -67,6 +67,7 @@ def parser(text_=None, regex=REGEX_ITEMS, pattern=REGEX_PATTERNS):
 
 # deduplicate iterable, obvious.
 def deduplicate(x):
+    x = x or ()  # prevent NoneType object to be iterate
     r = []
     for i in x:
         if i not in r:
