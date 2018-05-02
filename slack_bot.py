@@ -1,29 +1,3 @@
-#!/usr/local/bin/python3
-
-from slackclient import SlackClient
-import time
-import re
-import os
-from ruckus import Ruckus
-from getpass import getpass
-
-SLACK_BOT_TOKEN = os.environ.get('SLACK_BOT_TOKEN') or input('slack bot token: ')
-RUCKUS_USER = os.environ.get('RUCKUS_USER') or input('ruckus username: ')
-RUCKUS_PASS = os.environ.get('RUCKUS_PASS') or getpass('ruckus password: ')
-
-
-slack_client = SlackClient(SLACK_BOT_TOKEN)  # instantiate Slack client
-starterbot_id = None  # starterbot's user ID in Slack: value is assigned after the bot starts up
-
-# constants
-RTM_READ_DELAY = 1  # 1 second delay between reading from RTM
-EXAMPLE_COMMAND = 'add MAC'
-MENTION_REGEX = "^<@(|[WU].+?)>((.|\s)*)"
-
-def parse_bot_commands(slack_events):
-    """
-        Parses a list of events coming from the Slack RTM API to find bot commands.
-        If a bot command is found, this function returns a tuple of command and channel.
 #!/bin/sh/python
 
 from slackclient import SlackClient
