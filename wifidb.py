@@ -34,5 +34,3 @@ def InsertData(wifi,newwifi):
 if __name__ == '__main__':
     newwifi = { "team_user": "Bob", "team_name": "IT","mac": "11:22:33:44:55:66","customer": "Tom"}
     InsertData('wifi', newwifi)
-
-© 2018 GitHub, Inc.
