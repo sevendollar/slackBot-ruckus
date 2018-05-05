@@ -2,10 +2,10 @@ import pymysql
 
 
 class Sql:
-    def __init__(self, host, port, user):
-        self.host = host or 'localhost'
-        self.port = port or 3306
-        self.user = user or 'root'
+    def __init__(self, host='localhost', port=3306, user='root'):
+        self.host = host
+        self.port = port
+        self.user = user
 
     def __enter__(self):
         self.conn = pymysql.connect(host=self.host, port=self.port, user=self.user)
