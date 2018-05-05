@@ -1,3 +1,6 @@
+import pymysql
+
+
 class Sql:
     def __init__(self, host, port, user):
         self.host = host
@@ -5,7 +8,7 @@ class Sql:
         self.user = user
 
     def __enter__(self):
-        self.conn = pymysql.connect(host='10.7.12.65', port=32771, user='root')
+        self.conn = pymysql.connect(host='localhost', port=3306, user='root')
         self.cur = self.conn.cursor()
         print('db connection started!')
         return self.cur
