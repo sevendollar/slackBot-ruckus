@@ -11,7 +11,7 @@ class Sql:
         self.conn = pymysql.connect(host=self.host, port=self.port, user=self.user)
         self.cur = self.conn.cursor()
         print('db connection started!')
-        return self.cur
+        return self.conn, self.cur
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         if self.conn:
@@ -20,7 +20,7 @@ class Sql:
             print('db connection closed!')
 
 
-with Sql('10.7.12.65', 21771, 'root') as cur:
+with Sql('10.7.12.65', 21771) as (conn, cur):
     db = 'mysql'
     table = 'COOK_HING'
 
