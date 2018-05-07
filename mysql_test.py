@@ -20,20 +20,37 @@ class Sql:
             print('db connection closed!')
 
 
-with Sql('10.7.12.65', 21771) as (conn, cur):
-    db = 'mysql'
-    table = 'COOK_HING'
+db = 'jefDB'
+table = 'jefTABLE'
+fields = ('FirstName', 'LastName', 'Sex', 'Skill', 'Age')
+values = ('Jef', 'Lee', 'M', 'python', 18,)
 
-    sql_use_db_mysql = f'use {db};'
-    sql_create_table = f'''CREATE TABLE {table}(
-        FIRST_NAME  CHAR(20) NOT NULL,
-        LAST_NAME  CHAR(20),
-        AGE INT,
-        SEX CHAR(1),
-        INCOME FLOAT);
-        '''
-    try:
-        cur.execute(sql_use_db_mysql)
-        cur.execute(sql_create_table)
-    except pymysql.err.InternalError:
-        print('Oops, some shit happened.')
+sql_use_db = f'use {db};'
+sql_create_db = f'create database {db};'
+sql_is_db_exist = f'show databases like \'{db}\';'
+sql_is_table_exist = f'show tables like \'{table}\';'
+sql_create_table = f'''create table {db}.{table}(
+                        {fields[0]} CHAR(20),
+                        {fields[1]} CHAR(20),
+                        {fields[2]} CHAR(1),
+                        {fields[3]} CHAR(20),
+                        {fields[4]} INT);'''
+sql_insert = f'''insert into {db}.{table}({', '.join(fields)}) values{values};'''
+
+if __name__ == '__main__':
+    with Sql('10.7.12.65', 32772) as (conn, cur):
+        try:
+            if not cur.execute(sql_is_db_exist):  # create DB only if it doesn't exist.
+                cur.execute(sql_create_db)
+                cur.execute(sql_use_db)
+                if not cur.execute(sql_is_table_exist):  # create TABLE only if it doesn't exist.
+                    cur.execute(sql_create_table)
+            else:
+                cur.execute(sql_use_db)
+                if not cur.execute(sql_is_table_exist):  # create TABLE only if it doesn't exist.
+                    cur.execute(sql_create_table)
+            if cur.execute(sql_is_db_exist) and cur.execute(sql_is_table_exist):
+                cur.execute(sql_insert)
+                conn.commit()
+        except pymysql.err.InternalError as E:
+            print(E)
