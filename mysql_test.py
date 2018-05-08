@@ -3,15 +3,19 @@ import csv
 
 
 class Sql:
-    def __init__(self, host='localhost', port=3306, user='root'):
+    def __init__(self, host='localhost', port=3306, user='root', password=None, db=None):
         self.host = host
         self.port = port
         self.user = user
+        self.password = password or None
+        self.db = db or None
 
     def __enter__(self):
         self.conn = pymysql.connect(host=self.host,
                                     port=self.port,
                                     user=self.user,
+                                    password=self.password,
+                                    db=self.db,
                                     use_unicode=True,
                                     charset='utf8',)
         self.cur = self.conn.cursor()
@@ -42,7 +46,7 @@ sql_create_table = f'''create table {db}.{table}(
 # sql_insert = f'''insert into {db}.{table}({', '.join(fields)}) values{values};'''
 
 if __name__ == '__main__':
-    with Sql('10.7.12.65', 32785) as (conn, cur):
+    with Sql('10.7.12.65', password='my-secret-pw') as (conn, cur):
         try:
             if not cur.execute(sql_is_db_exist):  # create DB only if it doesn't exist.
                 cur.execute(sql_create_db)
