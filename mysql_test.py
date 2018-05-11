@@ -29,8 +29,11 @@ class Sql:
             print('db connection closed!')
 
 
-db = 'jefDB'
-table = 'jefTABLE'
+db = 'ruckus'
+table = 'wifi'
+port = 32772
+pw = 'jef'
+host = '10.5.1.65'
 fields = ('TeamName', 'TeamUser', 'CustermerName', 'ID', 'MAC')
 
 sql_use_db = f'use {db};'
@@ -42,11 +45,11 @@ sql_create_table = f'''create table {db}.{table}(
                         {fields[1]} CHAR(20),
                         {fields[2]} CHAR(20),
                         {fields[3]} CHAR(20),
-                        {fields[4]} CHAR(20) PRIMARY KEY);'''
+                        {fields[-1]} CHAR(20) PRIMARY KEY);'''
 # sql_insert = f'''insert into {db}.{table}({', '.join(fields)}) values{values};'''
 
 if __name__ == '__main__':
-    with Sql('10.7.12.65', password='my-secret-pw') as (conn, cur):
+    with Sql(host=host, port=port, password=pw) as (conn, cur):
         try:
             if not cur.execute(sql_is_db_exist):  # create DB only if it doesn't exist.
                 cur.execute(sql_create_db)
@@ -61,10 +64,10 @@ if __name__ == '__main__':
                 with open('Book1.csv', 'r') as csv_file:
                     for value in csv.reader(csv_file):  # loop through the whole csv.
                         # insert records only if it's not duplicated in the DB.
-                        if not cur.execute(f'select MAC from {db}.{table} where MAC = \'{value[4]}\';'):
+                        if not cur.execute(f'select MAC from {db}.{table} where MAC = \'{value[-1]}\';'):
                             cur.execute(f'''insert into {db}.{table}({', '.join(fields)}) values{tuple(value)};''')
                         else:
-                            print(f'{value[4]} existed!')
+                            print(f'{value[-1]} existed!')
                     conn.commit()
         except pymysql.err.InternalError as E:
             print(E)
