@@ -98,6 +98,7 @@ class Crawler:
 
 
 def interest_rate(country=None, intents=None):
+    intents = None if intents == '' else intents
     country = country is not None and country.upper() or None
     url = 'http://rate.bot.com.tw/xrt?Lang=zh-TW'  # taiwan bank
 
@@ -111,9 +112,12 @@ def interest_rate(country=None, intents=None):
                 i.find('div', 'hidden-phone').text.strip().split(' ')[0],  # chinese name
             )
         for i in soup.find('table').find('tbody').find_all('tr')}
-    return rate_lst.get(country, rate_lst) if intents is None else 'ha'
+    return rate_lst.get(country, rate_lst) if intents is None else (
+        rate_lst.get(country)[0] if country and intents == 'buy' else (
+            rate_lst.get(country)[1] if country and intents == 'sell' else 'unknown'))
 
 
 if __name__ == '__main__':
     country = Template('$country').substitute(country=input('what currency of country do your want to look up?'))
-    pprint(interest_rate(country))
+    intent = Template('$intent').substitute(intent=input('buy or sell?'))
+    pprint(interest_rate(country, intent))
