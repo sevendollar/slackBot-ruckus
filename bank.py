@@ -113,8 +113,8 @@ def interest_rate(country=None, intents=None):
             )
         for i in soup.find('table').find('tbody').find_all('tr')}
     return rate_lst.get(country, rate_lst) if intents is None else (
-        rate_lst.get(country)[0] if country and intents == 'buy' else (
-            rate_lst.get(country)[1] if country and intents == 'sell' else 'unknown'))
+        rate_lst.get(country)[0] if rate_lst.get(country) and intents == 'buy' else (
+            rate_lst.get(country)[1] if rate_lst.get(country) and intents == 'sell' else 'unknown'))
 
 
 if __name__ == '__main__':
