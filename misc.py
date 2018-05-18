@@ -14,7 +14,8 @@ REGEXs = {
     'macs': r'([a-z0-9]+[:-]){5}[a-z0-9]{0,2}',
     'customer_id': r'[a-z][0-9]{9}',
     'chinese_characters': r'[\u4e00-\u9fff]+',
-    'bad_words': r'(fuck|shit|fxxk|fxk|ass)'
+    'bad_words': r'(fuck|shit|fxxk|fxk|ass)',
+    'interest_rate': r'(interest|rate|buy|sell|usd|cny|jpn|aud)+'
 }
 
 REGEX_ITEMS = [x for x in REGEXs.keys()]
@@ -65,9 +66,17 @@ def parser(text_=None, regex=REGEX_ITEMS, pattern=REGEX_PATTERNS):
             # when illegal, put it in the dict and name it "fake_mac".
             result['fake_macs'] = result.get('fake_macs', tuple()) + (mac.lower(),)
 
-    # deduplicate macs
+    # de-duplicate macs
     result['macs'] = deduplicate(result.get('macs'))
     result['fake_macs'] = deduplicate(result.get('fake_macs'))
+    # get interest rate value.
+    interest_rate = result.get('interest_rate')
+    result['interest_rate'] = None if interest_rate is None\
+        else (
+            True,
+            None if ' '.join(interest_rate).replace('interest', '').replace('rate', '').strip() == ''\
+        else ' '.join(interest_rate).replace('interest', '').replace('rate', '').strip().split(' '),
+    )
 
     return result
 

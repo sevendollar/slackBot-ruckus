@@ -6,6 +6,9 @@ import re
 import os
 from ruckus import Ruckus
 from getpass import getpass
+import bank
+import misc
+import json
 
 SLACK_BOT_TOKEN = os.environ.get('SLACK_BOT_TOKEN') or input('slack bot token: ')
 RUCKUS_USER = os.environ.get('RUCKUS_USER') or input('ruckus username: ')
@@ -56,8 +59,34 @@ def handle_command(command, channel):
     Try *{EXAMPLE_COMMAND}* or *help* for more detail.
     '''
     response = None  # Finds and executes the given command, filling in response
+    parsed_command = misc.parser(command)
 
-    if command.startswith('add mac'):
+    if parsed_command.get('interest_rate'):
+        interest_rate = parsed_command.get('interest_rate')[-1]
+        # print(type(interest_rate))
+        # print(interest_rate)
+
+        if interest_rate is None:
+            response = f'{json.dumps(bank.interest_rate(), indent=4, ensure_ascii=False)}'
+        elif 'sell' in interest_rate:
+            del interest_rate[interest_rate.index('sell')]
+            if interest_rate:
+                response = bank.interest_rate(interest_rate[-1], 'sell')
+            else:
+                response = 'what do u wanna sell? gold???'
+        elif 'buy' in interest_rate:
+            del interest_rate[interest_rate.index('buy')]
+            if interest_rate:
+                response = bank.interest_rate(interest_rate[-1], 'buy')
+            else:
+                response = 'buy me a sports car!? nice...'
+        else:
+            response = f'bnak buy: {bank.interest_rate(interest_rate[-1])[0]}\nbnak sell: {bank.interest_rate(interest_rate[-1])[1]}'
+
+    elif parsed_command.get('bad_words'):
+        response = 'language!!!'
+
+    elif command.startswith('add mac'):
         slack_client.api_call(
             "chat.postMessage",
             channel=channel,
