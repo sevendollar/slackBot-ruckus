@@ -79,7 +79,6 @@ def deduplicate(x):
     )) or None
 
 
-
 def is_add_mac_legal(result):
     check_point = ()
     if len(result.get('chinese_characters') or '') != 3:
