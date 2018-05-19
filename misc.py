@@ -15,7 +15,9 @@ REGEXs = {
     'customer_id': r'[a-z][0-9]{9}',
     'chinese_characters': r'[\u4e00-\u9fff]+',
     'bad_words': r'(fuck|shit|fxxk|fxk|ass)',
-    'interest_rate': r'(interest|rate|buy|sell|usd|cny|jpn|aud)+'
+    'currency_rate': r'(interest|rate)',
+    'currency_intent': r'(buy|sell)',
+    'currency': r'(aud|cad|chf|cny|eur|gbp|hkd|jpy|krw|myr|nzd|php|sek|sgd|thb|usd|vnd|zar)',
 }
 
 REGEX_ITEMS = [x for x in REGEXs.keys()]
@@ -69,14 +71,11 @@ def parser(text_=None, regex=REGEX_ITEMS, pattern=REGEX_PATTERNS):
     # de-duplicate macs
     result['macs'] = deduplicate(result.get('macs'))
     result['fake_macs'] = deduplicate(result.get('fake_macs'))
+
     # get interest rate value.
-    interest_rate = result.get('interest_rate')
-    result['interest_rate'] = None if interest_rate is None\
-        else (
-            True,
-            None if ' '.join(interest_rate).replace('interest', '').replace('rate', '').strip() == ''\
-        else ' '.join(interest_rate).replace('interest', '').replace('rate', '').strip().split(' '),
-    )
+    result['currency_rate'] = deduplicate(result.get('currency_rate'))
+    result['currency_intent'] = deduplicate(result.get('currency_intent'))
+    result['currency'] = deduplicate(result.get('currency'))
 
     return result
 
