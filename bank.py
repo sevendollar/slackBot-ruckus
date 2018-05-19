@@ -97,27 +97,28 @@ class Crawler:
         return f'{self.__class__.__name__}({self.url})'
 
 
-def interest_rate(country=None, intents=None):
-    intents = None if intents == '' else intents
-    country = country is not None and country.upper() or None
+def interest_rate(currency=None, intent=None):
+    intent = None if intent == '' else intent
+    currency = currency is not None and currency.upper() or None
     url = 'http://rate.bot.com.tw/xrt?Lang=zh-TW'  # taiwan bank
 
     res = requests.get(url)
     soup = BeautifulSoup(res.text, 'lxml')
     rate_lst = {
-        i.find('div', 'hidden-phone').text.strip()[-4:-1]:  # country
+        i.find('div', 'hidden-phone').text.strip()[-4:-1]:  # currency
             (
-                i.find('td', 'rate-content-sight').text.replace('-', ''),  # buy rate
-                i.find('td', 'rate-content-sight').find_next('td').text.replace('-', ''),  # sell rate
-                i.find('div', 'hidden-phone').text.strip().split(' ')[0],  # chinese name
+                i.find('td', 'rate-content-sight').text.replace('-', ''),  # bank buy, user sell rate
+                i.find('td', 'rate-content-sight').find_next('td').text.replace('-', ''),  # bank sell, user buy rate
+                i.find('div', 'hidden-phone').text.strip().split(' ')[0],  # currency in chinese
             )
         for i in soup.find('table').find('tbody').find_all('tr')}
-    return rate_lst.get(country, rate_lst) if intents is None else (
-        rate_lst.get(country)[0] if rate_lst.get(country) and intents == 'buy' else (
-            rate_lst.get(country)[1] if rate_lst.get(country) and intents == 'sell' else 'unknown'))
+    return rate_lst.get(currency, rate_lst) if intent is None else (
+        rate_lst.get(currency)[1] if rate_lst.get(currency) and intent == 'buy' else (
+            rate_lst.get(currency)[0] if rate_lst.get(currency) and intent == 'sell' else 'unknown'))
 
 
 if __name__ == '__main__':
-    country = Template('$country').substitute(country=input('what currency of country do your want to look up?'))
-    intent = Template('$intent').substitute(intent=input('buy or sell?'))
-    pprint(interest_rate(country, intent))
+    pass
+    # country = Template('$country').substitute(country=input('what currency of country do your want to look up?'))
+    # intent = Template('$intent').substitute(intent=input('buy or sell?'))
+
