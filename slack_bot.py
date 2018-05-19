@@ -61,27 +61,28 @@ def handle_command(command, channel):
     response = None  # Finds and executes the given command, filling in response
     parsed_command = misc.parser(command)
 
-    if parsed_command.get('interest_rate'):
-        interest_rate = parsed_command.get('interest_rate')[-1]
-        # print(type(interest_rate))
-        # print(interest_rate)
+    currency_rate = parsed_command.get('currency_rate')
+    currency = parsed_command.get('currency')
+    currency_intent = parsed_command.get('currency_intent')
 
-        if interest_rate is None:
-            response = f'{json.dumps(bank.interest_rate(), indent=4, ensure_ascii=False)}'
-        elif 'sell' in interest_rate:
-            del interest_rate[interest_rate.index('sell')]
-            if interest_rate:
-                response = bank.interest_rate(interest_rate[-1], 'sell')
-            else:
-                response = 'what do u wanna sell? gold???'
-        elif 'buy' in interest_rate:
-            del interest_rate[interest_rate.index('buy')]
-            if interest_rate:
-                response = bank.interest_rate(interest_rate[-1], 'buy')
-            else:
-                response = 'buy me a sports car!? nice...'
+    if True in (bool(currency_rate), bool(currency), bool(currency_intent)):
+        mess_around_response = f'sorry dude, dont really know what u what...but good try though.'
+        miss_currency_response = 'u missed the currency, try that again!'
+        currency = currency or ''
+        currency_intent = currency_intent or ''
+        if len(currency) > 1 or len(currency_intent) > 1:
+            response = mess_around_response
         else:
-            response = f'bnak buy: {bank.interest_rate(interest_rate[-1])[0]}\nbnak sell: {bank.interest_rate(interest_rate[-1])[1]}'
+            currency = currency[0] if currency else None
+            currency_intent = currency_intent[0] if currency_intent else None
+            r = bank.interest_rate(currency, currency_intent)
+            response = miss_currency_response if r == 'unknown' else \
+                (
+                    f'you buy: {r[1]}\nyou sell: {r[0]}' if currency_intent is None and currency else \
+                        (
+                            f'{r}' if currency_intent and currency else f'{json.dumps(r, indent=4, ensure_ascii=False)}'
+                        )
+                )
 
     elif parsed_command.get('bad_words'):
         response = 'language!!!'
