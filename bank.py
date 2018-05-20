@@ -97,6 +97,7 @@ class Crawler:
         return f'{self.__class__.__name__}({self.url})'
 
 
+# returns a dict of interest rate data that comes from the Taiwan bank web page.
 def interest_rate(currency=None, intent=None):
     intent = None if intent == '' else intent
     currency = currency is not None and currency.upper() or None
@@ -116,6 +117,27 @@ def interest_rate(currency=None, intent=None):
         rate_lst.get(currency)[1] if rate_lst.get(currency) and intent == 'buy' else (
             rate_lst.get(currency)[0] if rate_lst.get(currency) and intent == 'sell' else 'unknown'))
 
+
+# returns a string of table of all interest rates which comes from interest_rate().
+def interest_rate_table():
+    i_rate = interest_rate()
+
+    currency_max_length = max(len(key) for key in i_rate.keys()) + 1
+    buy_max_length = max(len(key[1]) for key in i_rate.values()) + 1
+    sell_max_length = max(len(key[0]) for key in i_rate.values()) + 1
+
+    currency_column = 'curr'.ljust(currency_max_length)
+    buy_column = 'buy'.rjust(buy_max_length)
+    sell_column = 'sell'.ljust(sell_max_length)
+
+    r = f'{currency_column}|{buy_column} | {sell_column}\n'
+    x = ''.join([f'{key.ljust(currency_max_length)}|{value[1].rjust(buy_max_length)} | {value[0].ljust(buy_max_length)}({value[-1]})\n'\
+     for key, value in i_rate.items() if value[0]])
+
+    return r + x
+
+
+#  TODO: interest rate converter
 
 if __name__ == '__main__':
     pass

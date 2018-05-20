@@ -80,7 +80,7 @@ def handle_command(command, channel):
                 (
                     f'you buy: {r[1]}\nyou sell: {r[0]}' if currency_intent is None and currency else \
                         (
-                            f'{r}' if currency_intent and currency else f'{json.dumps(r, indent=4, ensure_ascii=False)}'
+                            f'{r}' if currency_intent and currency else bank.interest_rate_table()
                         )
                 )
 
