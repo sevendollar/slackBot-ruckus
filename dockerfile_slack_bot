@@ -10,7 +10,7 @@ RUN apt update && \
     apt install -y software-properties-common && \
     add-apt-repository -y ppa:deadsnakes/ppa && \
     apt update && \
-    apt install -y python3.6 vim curl && \
+    apt install -y python3.6 python3-distutils vim curl && \
     ln -s /usr/bin/python3.6 /usr/bin/python && \
     curl -sLO https://bootstrap.pypa.io/get-pip.py && \
     python get-pip.py && \
