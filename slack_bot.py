@@ -59,6 +59,16 @@ def handle_command(command, channel):
     Try *{EXAMPLE_COMMAND}* or *help* for more detail.
     '''
     response = None  # Finds and executes the given command, filling in response
+    attachment = None
+    greeting = ('Hello',
+                'it\'s nice to meet you',
+                'it\'s a pleasure to meet you',
+                'Hi!',
+                'What\'s up?',
+                'How\'s it going?',
+                'Yo!',
+                'What\'s happenin\'?',
+                )
     parsed_command = misc.parser(command)
 
     currency_rate = parsed_command.get('currency_rate')
@@ -84,6 +94,18 @@ def handle_command(command, channel):
                         )
                 )
 
+    elif command in ('jef', 'who made this app?', 'show me the author', 'author'):
+        image_jef = 'https://images-na.ssl-images-amazon.com/images/M/MV5BMTA5MjMyMzUwNDheQTJeQWpwZ15BbWU3MDU4NTE3MjQ@._CR95,52,361,361_UX402_UY402._SY201_SX201_AL_.jpg'
+        attachment = [{'title': None,
+                       'image_url': image_jef}]
+        response = ' '
+
+    elif command in ('cat', 'cats'):
+        response = ' '
+        image_cat = 'https://www.merriam-webster.com/assets/mw/static/newsletter/subscribe-overlay-cat.jpg'
+        attachment = [{'title': None,
+                       'image_url': image_cat}]
+
     elif parsed_command.get('bad_words'):
         response = 'language!!!'
 
@@ -101,16 +123,19 @@ def handle_command(command, channel):
         else:
             response = 'Oops, MAC existed...:cry:'
         del r
+    elif command in ('hi', 'hello', 'how'):
+        import random
+        response = random.choice(greeting)
     elif command == 'help':
         response = 'gotcha...there\'s not thing i can help with...:grin:'
     else:
         response = default_response
-
-    # Sends the response back to the channel
+        # Sends the response back to the channel
     slack_client.api_call(
         "chat.postMessage",
         channel=channel,
-        text=response or default_response
+        text=response or default_response,
+        attachments=attachment or None,
     )
 
 
