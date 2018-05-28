@@ -2,11 +2,15 @@ FROM ubuntu
 LABEL maintainer="sevendollar@gmail.com"
 WORKDIR /slack
 COPY ./*.py /slack/
+ENV DEBIAN_FRONTEND='noninteractive'
 ENV LANG='C.UTF-8'
 ENV SLACK_BOT_TOKEN=''
 ENV RUCKUS_USER=''
 ENV RUCKUS_PASS=''
 RUN apt update && \
+    apt-get install -y tzdata && \
+    ln -fs /usr/share/zoneinfo/Asia/Taipei /etc/localtime && \
+    dpkg-reconfigure --frontend noninteractive tzdata && \
     apt install -y software-properties-common && \
     add-apt-repository -y ppa:deadsnakes/ppa && \
     apt update && \
