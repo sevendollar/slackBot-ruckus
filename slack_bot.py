@@ -86,11 +86,12 @@ def handle_command(command, channel):
             currency = currency[0] if currency else None
             currency_intent = currency_intent[0] if currency_intent else None
             r = bank.interest_rate(currency, currency_intent)
+            time = bank.interest_rate().get('time')
             response = miss_currency_response if r == 'unknown' else \
                 (
-                    f'you buy: {r[1]}\nyou sell: {r[0]}' if currency_intent is None and currency else \
+                    f'{time}\n\nyou buy: {r[1]}\nyou sell: {r[0]}' if currency_intent is None and currency else \
                         (
-                            f'{r}' if currency_intent and currency else bank.interest_rate_table()
+                            f'{time}\n\n{r}' if currency_intent and currency else bank.interest_rate_table()
                         )
                 )
 

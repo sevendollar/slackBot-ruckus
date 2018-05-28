@@ -113,6 +113,7 @@ def interest_rate(currency=None, intent=None):
                 i.find('div', 'hidden-phone').text.strip().split(' ')[0],  # currency in chinese
             )
         for i in soup.find('table').find('tbody').find_all('tr')}
+    rate_lst.update({'time': soup.find('span', {'class': 'time'}).text})
     return rate_lst.get(currency, rate_lst) if intent is None else (
         rate_lst.get(currency)[1] if rate_lst.get(currency) and intent == 'buy' else (
             rate_lst.get(currency)[0] if rate_lst.get(currency) and intent == 'sell' else 'unknown'))
@@ -121,6 +122,7 @@ def interest_rate(currency=None, intent=None):
 # returns a string of table of all interest rates which comes from interest_rate().
 def interest_rate_table():
     i_rate = interest_rate()
+    time = i_rate.pop('time')
 
     currency_max_length = max(len(key) for key in i_rate.keys()) + 1
     buy_max_length = max(len(key[1]) for key in i_rate.values()) + 1
@@ -130,7 +132,7 @@ def interest_rate_table():
     buy_column = 'buy'.rjust(buy_max_length)
     sell_column = 'sell'.ljust(sell_max_length)
 
-    r = f'{currency_column}|{buy_column} | {sell_column}\n'
+    r = f'{time}\n\n{currency_column}|{buy_column} | {sell_column}\n'
     x = ''.join([f'{key.ljust(currency_max_length)}|{value[1].rjust(buy_max_length)} | {value[0].ljust(buy_max_length)}({value[-1]})\n'\
      for key, value in i_rate.items() if value[0]])
 
