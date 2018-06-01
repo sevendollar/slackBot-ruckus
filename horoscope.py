@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urlencode
 import datetime
+from slackclient import SlackClient
 
 today = datetime.date.today()
 yesterday = today - datetime.timedelta(days=1)
@@ -31,5 +32,18 @@ def luck(star=None, day=today):
     analyse4 = f'財運運分析：\n{today_content[4].split("：")[1]}'
     return f'{star_sign}\n{stars_part1}\n{stars_part2}\n{today_word}\n\n{analyse1}\n\n{analyse2}\n\n{analyse3}\n\n{analyse4}'
 
+
 if __name__ == '__main__':
-    print(luck())
+    SLACK_TOKEN = ''
+    sc = SlackClient(SLACK_TOKEN)
+
+    user_lst = {i.get('name'): {'id': i.get('id')} for i in sc.api_call('users.list').get('members')}
+    [user_lst.get(k).update({'dm_id': i.get('id')}) for k, v in user_lst.copy().items() for i in sc.api_call('im.list').get('ims') if v.get('id') == i.get('user')]
+
+    channel_lst = {i.get('name'): {'id': i.get('id')} for i in sc.api_call('channels.list').get('channels')}
+    group_lst = {i.get('name'): {'id': i.get('id')} for i in sc.api_call('groups.list').get('groups')}
+    [channel_lst.update({k: v}) for k, v in group_lst.items()]
+
+    print(sc.api_call('chat.postMessage',
+                      channel=user_lst.get('sevendollar').get('dm_id'),
+                      text=f'{luck(1)}').get('ok'))
