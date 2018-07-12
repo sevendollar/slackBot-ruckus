@@ -1,6 +1,5 @@
 #-*- coding: utf-8 -*-
 import pymysql
-import csv
 
 class Sql:
     def __init__(self, host='localhost', port=3306, user='royce', password=None, db=None):
@@ -63,13 +62,17 @@ def InsertData(new_words):
                 if not cur.execute(sql_is_table_exist):  # create TABLE only if it doesn't exist.
                     cur.execute(sql_create_table)
             if cur.execute(sql_is_db_exist) and cur.execute(sql_is_table_exist):
-                for key,value in new_words.items():
+                for key, value in new_words.items():
                     new_value.append(value)
                     V = ','.join("'" + i + "'" for i in new_value)
-                #print(f'''INSERT IGNORE INTO {db}.{table}({', '.join(fields)})  VALUES ({V});''')
                 cur.execute(f'''INSERT IGNORE INTO {db}.{table}({', '.join(fields)})  VALUES ({V});''')
-                # cur.execute(f'''insert ignore into {db}.{table}({', '.join(fields)}) values{tuple(value)};''')
-                print(f'{value[-1]} existed!')
+                print(f'成功新增{key}:{value}!')
+
                 conn.commit()
+
         except pymysql.err.InternalError as E:
             print(E)
+
+
+
+
