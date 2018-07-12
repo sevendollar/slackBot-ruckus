@@ -1,5 +1,6 @@
 #-*- coding: utf-8 -*-
 import pymysql
+import csv
 
 class Sql:
     def __init__(self, host='localhost', port=3306, user='royce', password=None, db=None):
@@ -65,14 +66,13 @@ def InsertData(new_words):
                 for key, value in new_words.items():
                     new_value.append(value)
                     V = ','.join("'" + i + "'" for i in new_value)
-                cur.execute(f'''INSERT IGNORE INTO {db}.{table}({', '.join(fields)})  VALUES ({V});''')
-                print(f'成功新增{key}:{value}!')
+                if not cur.execute(f'select mac from {db}.{table} where mac = \'{value}\';'):
+                    cur.execute(f'''INSERT IGNORE INTO {db}.{table}({', '.join(fields)})  VALUES ({V});''')
+                    print(f'成功新增{value}')
+                else:
+                    print(f'此{value}已經存在')
 
                 conn.commit()
 
         except pymysql.err.InternalError as E:
             print(E)
-
-
-
-
