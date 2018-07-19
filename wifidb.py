@@ -1,6 +1,5 @@
 #-*- coding: utf-8 -*-
 import pymysql
-import csv
 
 class Sql:
     def __init__(self, host='localhost', port=3306, user='royce', password=None, db=None):
@@ -19,14 +18,12 @@ class Sql:
                                     use_unicode=True,
                                     charset='utf8',)
         self.cur = self.conn.cursor()
-        print('資料庫連接成功! db connection started!')
         return self.conn, self.cur
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         if self.conn:
             self.cur.close()
             self.conn.close()
-            print('關閉資料庫連接! db connection closed!')
 
 db = 'ruckus'
 table = 'wifi'
@@ -70,17 +67,17 @@ def InsertData(new_words):
                     K = ','.join(i for i in new_key)
                     V = ','.join("'" + i + "'" for i in new_value)
                 if not cur.execute(f'select mac from {db}.{table} where mac = \'{new_value[-1]}\';'):
-                    cur.execute(f'''insert into {db}.{table}({K}) values ({V});''')
+                    cur.execute(f'''INSERT INTO {db}.{table}({K})  VALUES ({V});''')
+                    conn.commit()
                     if cur.execute(f'select mac from {db}.{table} where mac = \'{new_value[-1]}\';'):
-                        print(f'成功新增 {new_value[-1]}至資料庫!')
-                        return True or None
+                        #print(f'成功新增 {new_value[-1]}至資料庫!')
+                        return True
+                    else:
+                        #print('資料寫入失敗！')
+                        return False
                 else:
-                    print(f'{new_value[-1]}已存在!')
-                    return False or None
-
-
-                conn.commit()
-
+                    #print(f'{new_value[-1]}已存在!')
+                    return False
         except pymysql.err.InternalError as E:
             print(E)
 

@@ -6,11 +6,12 @@ import re
 import os
 from ruckus import Ruckus
 from getpass import getpass
+#from wifidb import insertData
+from wifidb import InsertData
 
-SLACK_BOT_TOKEN = os.environ.get('SLACK_BOT_TOKEN') or input('slack bot token: ')
-RUCKUS_USER = os.environ.get('RUCKUS_USER') or input('ruckus username: ')
-RUCKUS_PASS = os.environ.get('RUCKUS_PASS') or getpass('ruckus password: ')
-
+SLACK_BOT_TOKEN ='xoxb-347009540068-kKFx6yws1Kh57XV0HyWI0GOo'
+RUCKUS_USER = 'royce'
+RUCKUS_PASS = 'Rtp6u4c06'
 
 slack_client = SlackClient(SLACK_BOT_TOKEN)  # instantiate Slack client
 starterbot_id = None  # starterbot's user ID in Slack: value is assigned after the bot starts up
@@ -67,7 +68,13 @@ def handle_command(command, channel):
         mac = parse_user_words(command).get('mac')
         r = Ruckus(RUCKUS_USER, RUCKUS_PASS)
         if r.add_mac(mac):
-            response = f'successfully added *{mac}*...:tada:'
+            new_words = parse_user_words(command)
+            if InsertData(new_words):
+                print('1')
+                response = f'successfully added *{mac}*...:tada:'
+                print('2')
+            else:
+                response = '資料寫入失敗！請在嘗試一次...:cry:'
         else:
             response = 'Oops, MAC existed...:cry:'
         del r
