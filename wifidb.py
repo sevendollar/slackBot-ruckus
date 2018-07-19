@@ -36,6 +36,7 @@ host = '10.5.1.113'
 
 fields = ('team_name', 'team_user', 'customer_name', 'customer_id', 'mac')
 new_value = []
+new_key = []
 
 sql_use_db = f'use {db};'
 sql_create_db = f'create database {db};'
@@ -64,13 +65,20 @@ def InsertData(new_words):
                     cur.execute(sql_create_table)
             if cur.execute(sql_is_db_exist) and cur.execute(sql_is_table_exist):
                 for key, value in new_words.items():
+                    new_key.append(key)
                     new_value.append(value)
+                    K = ','.join(i for i in new_key)
                     V = ','.join("'" + i + "'" for i in new_value)
-                cur.execute(f'''INSERT IGNORE INTO {db}.{table}({', '.join(fields)})  VALUES ({V});''')
-                cur.execute(f'select mac  from {db}.{table} where mac = \'value\';')
-                for row in cur:
-                    print(f'成功新增{row}')
-                    #print(f'成功新增{value}')
+                if not cur.execute(f'select mac from {db}.{table} where mac = \'{new_value[-1]}\';'):
+                    cur.execute(f'''insert into {db}.{table}({K}) values ({V});''')
+                    if cur.execute(f'select mac from {db}.{table} where mac = \'{new_value[-1]}\';'):
+                        print(f'成功新增 {new_value[-1]}至資料庫!')
+                        return True or None
+                else:
+                    print(f'{new_value[-1]}已存在!')
+                    return False or None
+
+
                 conn.commit()
 
         except pymysql.err.InternalError as E:
