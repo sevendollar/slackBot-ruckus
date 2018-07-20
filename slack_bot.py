@@ -9,9 +9,9 @@ from getpass import getpass
 #from wifidb import insertData
 from wifidb import InsertData
 
-SLACK_BOT_TOKEN ='xoxb-347009540068-kKFx6yws1Kh57XV0HyWI0GOo'
-RUCKUS_USER = 'royce'
-RUCKUS_PASS = 'Rtp6u4c06'
+-SLACK_BOT_TOKEN = os.environ.get('SLACK_BOT_TOKEN') or input('slack bot token: ')
+-RUCKUS_USER = os.environ.get('RUCKUS_USER') or input('ruckus username: ')
+-RUCKUS_PASS = os.environ.get('RUCKUS_PASS') or getpass('ruckus password: ')
 
 slack_client = SlackClient(SLACK_BOT_TOKEN)  # instantiate Slack client
 starterbot_id = None  # starterbot's user ID in Slack: value is assigned after the bot starts up
@@ -62,7 +62,7 @@ def handle_command(command, channel):
         slack_client.api_call(
             "chat.postMessage",
             channel=channel,
-            text='Working on it...:slightly_smiling_face:'
+            text=':robot_face:作業中..請耐心等候!:slightly_smiling_face:'
         )
         print(parse_user_words(command))
         mac = parse_user_words(command).get('mac')
@@ -70,20 +70,21 @@ def handle_command(command, channel):
         if r.add_mac(mac):
             new_words = parse_user_words(command)
             if InsertData(new_words):
+                response = ':confetti_ball:恭喜您!..成功新增 *{mac}*...:tada:'
                 print('1')
-                response = f'successfully added *{mac}*...:tada:'
-                print('2')
             else:
-                response = '資料寫入失敗！請在嘗試一次...:cry:'
+                response = ':x:資料寫入失敗!...:cry:  請再次嘗試一次,或聯繫資訊人員,協助處理'
+                print('2')
         else:
             response = 'Oops, MAC existed...:cry:'
+            print('3')
         del r
     elif command == 'help':
         response = 'gotcha...there\'s not thing i can help with...:grin:'
     else:
         response = default_response
 
-    # Sends the response back to the channel
+        # Sends the response back to the channel
     slack_client.api_call(
         "chat.postMessage",
         channel=channel,
