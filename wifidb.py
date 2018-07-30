@@ -47,6 +47,7 @@ sql_create_table = f'''create table {db}.{table}(
                         {fields[3]} CHAR(20),
                         {fields[-1]} CHAR(20) PRIMARY KEY);'''
 
+
 def InsertData(new_words):
     with Sql(host=host, port=port, password=pw) as (conn, cur):
         try:
@@ -62,9 +63,10 @@ def InsertData(new_words):
             if cur.execute(sql_is_db_exist) and cur.execute(sql_is_table_exist):
                 for key, value in new_words.items():
                     new_value.append(value)
+                    V = ','.join("'" + i + "'" for i in new_value[1:5])
                     K = ', '.join(new_key)
-                    V = ','.join("'" + i + "'" for i in new_value)
                 if not cur.execute(f'select mac from {db}.{table} where mac = \'{new_value[-1]}\';'):
+                    # print(f'select mac from {db}.{table} where mac = \'{new_value[-1]}\';')
                     cur.execute(f'''INSERT INTO {db}.{table}({K})  VALUES ({V});''')
                     conn.commit()
                     if cur.execute(f'select mac from {db}.{table} where mac = \'{new_value[-1]}\';'):
@@ -72,13 +74,12 @@ def InsertData(new_words):
                         return True
                     else:
                         print('資料寫入失敗！')
-                        return False or None
+                        return False
             else:
                 print(f'{new_value[-1]}已存在!')
                 return False or None
+            new_value.clear()
         except pymysql.err.InternalError as E:
             print(E)
-
-
 
 
