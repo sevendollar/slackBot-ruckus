@@ -63,7 +63,7 @@ def InsertData(new_words):
             if cur.execute(sql_is_db_exist) and cur.execute(sql_is_table_exist):
                 for key, value in new_words.items():
                     new_value.append(value)
-                    V = ','.join("'" + i + "'" for i in new_value[1:5])
+                    V = ','.join("'" + i + "'" for i in new_value[0:5])
                     K = ', '.join(new_key)
                 if not cur.execute(f'select mac from {db}.{table} where mac = \'{new_value[-1]}\';'):
                     # print(f'select mac from {db}.{table} where mac = \'{new_value[-1]}\';')
