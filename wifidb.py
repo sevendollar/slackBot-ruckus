@@ -1,8 +1,9 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 import pymysql
 
+
 class Sql:
-    def __init__(self, host='localhost', port=3306, user='royce', password=None, db=None):
+    def __init__(self, host='localhost', port= 3306, user='royce', password=None, db=None):
         self.host = host
         self.port = port
         self.user = user
@@ -18,38 +19,38 @@ class Sql:
                                     use_unicode=True,
                                     charset='utf8',)
         self.cur = self.conn.cursor()
-        print('資料庫連接成功! db connection started!')
         return self.conn, self.cur
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         if self.conn:
             self.cur.close()
             self.conn.close()
-            print('關閉資料庫連接! db connection closed!')
+
 
 db = 'ruckus'
 table = 'wifi'
 port = 3306
 pw = 'Royce898O4142'
 host = '10.5.1.113'
-
 fields = ('team_name', 'team_user', 'customer_name', 'customer_id', 'mac')
+new_key = []
 new_value = []
+
 
 sql_use_db = f'use {db};'
 sql_create_db = f'create database {db};'
 sql_is_db_exist = f'show databases like \'{db}\';'
 sql_is_table_exist = f'show tables like \'{table}\';'
 sql_create_table = f'''create table {db}.{table}(
-                        {fields[0]} CHAR(20),
+                        {fields[0]} CHAR(20),  
                         {fields[1]} CHAR(20),
                         {fields[2]} CHAR(20),
                         {fields[3]} CHAR(20),
                         {fields[-1]} CHAR(20) PRIMARY KEY);'''
-# sql_insert = f'''insert into {db}.{table}({', '.join(fields)}) values{values};'''
-
 
 def InsertData(new_words):
+    new_value = []
+    new_key = []
     with Sql(host=host, port=port, password=pw) as (conn, cur):
         try:
             if not cur.execute(sql_is_db_exist):  # create DB only if it doesn't exist.
@@ -63,16 +64,21 @@ def InsertData(new_words):
                     cur.execute(sql_create_table)
             if cur.execute(sql_is_db_exist) and cur.execute(sql_is_table_exist):
                 for key, value in new_words.items():
+                    new_key.append(key)
                     new_value.append(value)
                     V = ','.join("'" + i + "'" for i in new_value)
-                cur.execute(f'''INSERT IGNORE INTO {db}.{table}({', '.join(fields)})  VALUES ({V});''')
-                print(f'成功新增{key}:{value}!')
-
-                conn.commit()
+                    K = ', '.join(new_key)
+                if not cur.execute(f'select mac from {db}.{table} where mac = \'{new_value[-1]}\';'):
+                    cur.execute(f'''INSERT INTO {db}.{table}({K})  VALUES ({V});''')
+                    conn.commit()
+                    if cur.execute(f'select mac from {db}.{table} where mac = \'{new_value[-1]}\';'):
+                        return True
+                    else:
+                        return False
+                else:
+                    return False or None
+            else:
+                return False or None
 
         except pymysql.err.InternalError as E:
             print(E)
-
-
-
-
