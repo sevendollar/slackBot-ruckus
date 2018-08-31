@@ -8,6 +8,8 @@ ENV RUCKUS_USER=''
 ENV RUCKUS_PASS=''
 RUN apt update && \
     apt install -y software-properties-common && \
+    echo "Asia/Shanghai" > /etc/timezone && \
+    dpkg-reconfigure -f noninteractive tzdata && \
     add-apt-repository -y ppa:deadsnakes/ppa && \
     apt update && \
     apt install -y python3.6 vim curl && \
