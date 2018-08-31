@@ -1,0 +1,17 @@
+FROM mariadb:latest
+LABEL maintainer="roycechen68@gmail.com"
+
+ENV MYSQL_ROOT_PASSWORD 1234
+ENV LC_ALL en_US.UTF-8
+ENV MYSQL_DATABASE testdb
+ENV MYSQL_USER TEST
+ENV MYSQL_PASSWORD 1234
+
+COPY scripts /scripts
+RUN chmod +x /scripts/start
+
+EXPOSE 3306
+
+VOLUME ["/var/lib/mysql"]
+
+ENTRYPOINT ["/scripts/start"]

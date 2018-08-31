@@ -1,36 +1,84 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 import pymysql
 
-def InsertData(wifi,newwifi):
-    try:
-        conn = pymysql.connect(host='localhost', user='USER', password='PASSWORD', port=3306, db='DB', charset="utf8")
-        cur = conn.cursor()
-        COLstr = ''  # 列的字段
-        ROWstr = ''  # 行字段
 
-        ColumnStyle = ' CHAR(20)'
+class Sql:
+    def __init__(self, host='localhost', port= 3306, user='royce', password=None, db=None):
+        self.host = host
+        self.port = port
+        self.user = user
+        self.password = password or None
+        self.db = db or None
 
-	sql_looping_list = ["mac", "team_name", "team_user", "customer"]
-        for key in sql_looping_list:
-            COLstr = COLstr + ' ' + key + ColumnStyle + ','
-            ROWstr = (ROWstr + '"%s"' + ',') % (newwifi.get(key))
+    def __enter__(self):
+        self.conn = pymysql.connect(host=self.host,
+                                    port=self.port,
+                                    user=self.user,
+                                    password=self.password,
+                                    db=self.db,
+                                    use_unicode=True,
+                                    charset='utf8',)
+        self.cur = self.conn.cursor()
+        return self.conn, self.cur
 
-            #判斷該列表是否存在，存在將執行try，不存執行except(新建表)，再insert資料
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if self.conn:
+            self.cur.close()
+            self.conn.close()
+
+
+db = 'ruckus'
+table = 'wifi'
+port = 3306
+pw = 'Royce898O4142'
+host = '10.5.1.113'
+fields = ('team_name', 'team_user', 'customer_name', 'customer_id', 'mac')
+new_key = []
+new_value = []
+
+
+sql_use_db = f'use {db};'
+sql_create_db = f'create database {db};'
+sql_is_db_exist = f'show databases like \'{db}\';'
+sql_is_table_exist = f'show tables like \'{table}\';'
+sql_create_table = f'''create table {db}.{table}(
+                        {fields[0]} CHAR(20),  
+                        {fields[1]} CHAR(20),
+                        {fields[2]} CHAR(20),
+                        {fields[3]} CHAR(20),
+                        {fields[-1]} CHAR(20) PRIMARY KEY);'''
+
+def InsertData(new_words):
+    new_value = []
+    new_key = []
+    with Sql(host=host, port=port, password=pw) as (conn, cur):
         try:
-            cur.execute("SELECT * FROM  %s" % (wifi))
-            cur.execute("INSERT INTO %s VALUES (%s)" % (wifi, ROWstr[:-1]))
+            if not cur.execute(sql_is_db_exist):  # create DB only if it doesn't exist.
+                cur.execute(sql_create_db)
+                cur.execute(sql_use_db)
+                if not cur.execute(sql_is_table_exist):  # create TABLE only if it doesn't exist.
+                    cur.execute(sql_create_table)
+            else:
+                cur.execute(sql_use_db)
+                if not cur.execute(sql_is_table_exist):  # create TABLE only if it doesn't exist.
+                    cur.execute(sql_create_table)
+            if cur.execute(sql_is_db_exist) and cur.execute(sql_is_table_exist):
+                for key, value in new_words.items():
+                    new_key.append(key)
+                    new_value.append(value)
+                    V = ','.join("'" + i + "'" for i in new_value)
+                    K = ', '.join(new_key)
+                if not cur.execute(f'select mac from {db}.{table} where mac = \'{new_value[-1]}\';'):
+                    cur.execute(f'''INSERT INTO {db}.{table}({K})  VALUES ({V});''')
+                    conn.commit()
+                    if cur.execute(f'select mac from {db}.{table} where mac = \'{new_value[-1]}\';'):
+                        return True
+                    else:
+                        return False
+                else:
+                    return False or None
+            else:
+                return False or None
 
-        except pymysql.Error as e:
-            cur.execute("CREATE TABLE %s (%s)" % (newwifi, COLstr[:-1]))
-            cur.execute("INSERT INTO %s VALUES (%s)" % (newwifi, ROWstr[:-1]))
-        conn.commit()
-        cur.close()
-        conn.close()
-
-    except pymysql.Error as e:
-        print
-        "Mysql Error %d: %s" % (e.args[0], e.args[1])
-
-if __name__ == '__main__':
-    newwifi = { "team_user": "Bob", "team_name": "IT","mac": "11:22:33:44:55:66","customer": "Tom"}
-    InsertData('wifi', newwifi)
+        except pymysql.err.InternalError as E:
+            print(E)

@@ -24,7 +24,10 @@ class Ruckus:
 
     def __init__(self, username, password):
         self.macs = {}
-        self.driver = webdriver.PhantomJS(service_args=['--ignore-ssl-errors=true'])
+        self.driver = webdriver.PhantomJS(
+            service_args=['--ignore-ssl-errors=true'],
+            executable_path=os.path.join(os.path.abspath('.'), 'phantomjs'),
+        )
         self.driver.implicitly_wait(30)
         self.driver.set_window_size(1024, 768)
 
